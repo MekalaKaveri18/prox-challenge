@@ -1,92 +1,118 @@
-# Prox Engineering Challenge
+# Prox Founding Engineer Challenge
 
-<img src="product.webp" alt="Vulcan OmniPro 220" width="400" /> <img src="product-inside.webp" alt="Vulcan OmniPro 220 — inside panel" width="400" />
+Multimodal shop tech for the **Vulcan OmniPro 220** (Harbor Freight 57812).
 
-## The Product
+Not a RAG chatbot. A compiled knowledge pack (duty tables, polarity maps, troubleshooting, captioned manual pages) plus the [Claude Agent SDK](https://code.claude.com/docs/en/agent-sdk) driving tools that **draw** sockets, duty-cycle clocks, and checklists, and **surface the actual page** from the book.
 
-The [Vulcan OmniPro 220](https://www.harborfreight.com/omnipro-220-industrial-multiprocess-welder-with-120240v-input-57812.html) is a multiprocess welding system sold by Harbor Freight. It supports four welding processes (MIG, Flux-Cored, TIG, and Stick), runs on both 120V and 240V input, and has an LCD-based synergic control system.
+## Demo video
 
-Its owner's manual is 48 pages of dense technical content. Duty cycle matrices across multiple voltages and amperages, polarity setup procedures that differ per welding process, wire feed mechanisms with specific tensioner calibrations, wiring schematics, troubleshooting matrices, weld diagnosis diagrams, and a full parts list.
+The demo lives in this folder: **`docs/`**
 
-This is exactly the kind of product Prox exists for. Nobody knows how to use this machine straight out of the box but has time to read 48 page manual, but a complicated machine needs expert-level support.
+| File | What it is |
+|---|---|
+| [`docs/omnipro-demo.gif`](docs/omnipro-demo.gif) | Inline preview (this is what GitHub shows below) |
+| [`docs/omnipro-demo.mp4`](docs/omnipro-demo.mp4) | Full 30s recording — click the GIF or this link |
 
-Additional video: https://www.youtube.com/watch?v=kxGDoGcnhBw
+It walks the three evaluation questions: MIG duty cycle (**25%** at 200 A / 240 V), TIG ground clamp in the **positive** socket, and flux-cored porosity with a checklist plus manual pages.
 
-## Your Job
+[![Click for the MP4 demo](docs/omnipro-demo.gif)](docs/omnipro-demo.mp4)
 
-Build a multimodal reasoning agent for the Vulcan OmniPro 220 using the Claude Agent SDK. The agent must be able to answer deep technical questions about this product accurately, helpfully, and not just in text.
+<img src="product.webp" alt="Vulcan OmniPro 220" width="360" />
+<img src="product-inside.webp" alt="Vulcan OmniPro 220 — inside panel" width="360" />
 
-The manuals are in the `files/` directory.
+The original Prox briefing (what they asked us to build) is in [`CHALLENGE.md`](CHALLENGE.md). This README is the solution.
 
-**There is no limit to how far you can go.** You can integrate voice. You can build a full interactive experience. Sky is the limit. The more ambitious and polished, the better.
-
-## What We're Testing
-
-### 1. Deep Technical Accuracy
-
-Your agent needs to answer questions like these correctly:
-
-- "What's the duty cycle for MIG welding at 200A on 240V?"
-- "I'm getting porosity in my flux-cored welds. What should I check?"
-- "What polarity setup do I need for TIG welding? Which socket does the ground clamp go in?"
-
-We will test with questions that require cross-referencing multiple manual sections, understanding visual content (diagrams, schematics, charts), and handling ambiguous questions that need clarification from the user.
-
-### 2. Multimodal Responses
-
-This is the most important part. Your agent must not be text-only.
-
-- If someone asks about polarity setup, the agent should draw or show a diagram of which cable goes in which socket, not just describe it.
-- If the answer relates to a specific image in the manual (the wire feed mechanism, the front panel controls, the weld diagnosis examples), the agent should surface that image.
-- If a question is complex enough, the agent should generate interactive content: a duty cycle calculator, a troubleshooting flowchart, a settings configurator that takes process + material + thickness and outputs recommended wire speed and voltage.
-
-When something is too cognitively hard to explain in words, the agent should draw it. Real-time diagrams, interactive schematics, visual walkthroughs generated through code.
-
-For your agent to handle these responses well you need to reverse engineer Claude artifacts. Here are two places where you can start:
-- https://claude.ai/artifacts (see how Claude renders interactive artifacts in chat)
-- https://www.reidbarber.com/blog/reverse-engineering-claude-artifacts
-
-### 3. Tone and Helpfulness
-
-Imagine your user just bought this welder and is standing in their garage trying to set it up. They're not an idiot, but they're not a professional welder either.
-
-### 4. Knowledge Extraction Quality
-
-The manual has a mix of text, tables, labeled diagrams, schematics, and decision matrices. Some critical information exists only in images (the welding process selection chart, the weld diagnosis photos, the wiring schematic). We want to see that your agent understands and presents the visual content, not just the text.
-
-## Tech Requirements
-
-- Use the [Anthropic Claude Agent SDK](https://docs.anthropic.com) as the foundation for your agent.
-- The project must run locally with a single API key provided via `.env`.
-- You are responsible for your own API costs during development.
-
-## How to Present Your Work
-
-**This matters.** Your submission is not just the code — it's how you present it.
-
-- **Build a frontend.** The best way for us to evaluate your agent is if it has a clean, simple UI we can run immediately. This is realistically the only way to properly demo an agent like this.
-- **Hosting is a plus.** If you host it somewhere we can access without cloning, that's a strong signal. Not required, but it removes friction and shows initiative.
-- **Write a clear README.** Explain how your agent works, what design decisions you made, how knowledge is extracted and represented, and how to run it. Your documentation will be evaluated — we want to see how you think and communicate, not just how you code.
-- **Video walkthrough is a huge plus.** Record yourself demoing the agent and explaining your approach. Walk through the hard questions, show how it handles multimodal responses, explain your architecture. This gives us a much richer picture of your work than code alone.
-
-We should be running your agent within 2 minutes of cloning your repo:
+## Run locally (≈2 minutes)
 
 ```bash
-git clone <your-fork>
-cd <your-fork>
-cp .env.example .env   # we plug in our own Anthropic API key
-# your install command (npm install, uv install, etc.)
-# your run command (npm run dev, python app.py, etc.)
+git clone https://github.com/MekalaKaveri18/prox-challenge
+cd prox-challenge
+cp .env.example .env.local
+# paste your Anthropic key: ANTHROPIC_API_KEY=sk-ant-…
+npm install
+npm run dev
 ```
 
-If it takes longer than that to set up, that's a problem.
+Open [http://127.0.0.1:43181](http://127.0.0.1:43181).
 
-## What to Submit
+Without a key the UI still runs the **compiled pack** on the three evaluation questions so you can see diagrams and manual pages. With a key, turns go through the Claude Agent SDK (`query()` + in-process MCP tools). That is the submission path Prox will use.
 
-1. Fork this repo.
-2. Build your solution.
-3. Submit your fork URL through the form at [useprox.com/join/challenge](https://useprox.com/join/challenge).
+## What we were tested on
 
-## What Happens Next
+| Question | Grounded answer |
+|---|---|
+| Duty cycle, MIG 200 A on 240 V | **25%** — 2.5 min weld / 7.5 min rest in a 10 min window. Manual p.7, p.19, nameplate. |
+| Porosity on flux-cored | Ordered checks: **DCEN polarity first**, then dirty metal, dirty wire, no gas on self-shielded, CTWD &lt; ½", steady travel. Manual p.37 + p.43 + diagnosis photos. |
+| TIG polarity / ground socket | **DCEN**. Ground clamp → **POSITIVE (+)**. Torch → **NEGATIVE (−)**. 100% argon 10–25 SCFH. Manual p.24. |
 
-We review submissions on a rolling basis and respond to every single one within a few days. Good luck.
+## Architecture
+
+```
+files/*.pdf  →  (compile)  →  knowledge pack + /public/manual/*.jpg
+                                      ↓
+                         Claude Agent SDK  query()
+                         MCP server "omni" (same process)
+                           lookup_spec
+                           get_duty_cycle   → artifact + figure
+                           get_polarity     → artifact + figure
+                           get_figure
+                           render_artifact  (Claude-artifacts iframe)
+                                      ↓
+                         Next.js UI  chat | workbench
+```
+
+### Why not vector RAG over the PDF
+
+The facts that fail interviews live in **tables and drawings**: dinse sockets, duty-cycle nameplate, weld-diagnosis photos, the door sticker. An embedding over OCR will miss a socket or invent 30% duty cycle. The pack stores those as data. The model **looks them up**. Diagrams are rendered from that data, not freehanded SVG.
+
+### Knowledge pack
+
+`src/lib/knowledge/pack.ts` is the engine:
+
+- Rated duty points from p.7 / p.19 / p.29 / the data plate (including 60% nameplate rows)
+- Polarity + exact sockets per process
+- Troubleshooting trees (porosity, unstable arc, bird’s nest)
+- Figure index: captioned JPEGs of the real pages (`public/manual/`)
+
+Interpolation between published duty points is labeled as interpolation. Exact nameplate cells are labeled as rated.
+
+### Agent SDK
+
+`src/lib/agent/run.ts` uses `query()` from `@anthropic-ai/claude-agent-sdk` with `createSdkMcpServer` / `tool()`. Built-in Bash/Edit/Web tools are disallowed. `settingSources: []` and `strictMcpConfig: true` so the agent only sees this product’s tools.
+
+### Multimodal output
+
+Workbench on the right (stacked on mobile):
+
+1. **Artifact iframe** — sandboxed HTML, same idea as Claude artifacts: polarity board, duty-cycle clock, porosity checklist, settings configurator.
+2. **Manual page** — the actual figure from the owner’s manual, quick-start, or selection chart.
+
+Voice is browser push-to-talk (Web Speech) plus speak-back. Photo attach is for weld diagnosis against the p.35–37 charts.
+
+### Tone
+
+Garage lead, not Zendesk. Next action, socket names, then the picture.
+
+## Design decisions worth arguing about
+
+- **Codegen as primitive, data as source of truth.** The model chooses *which* artifact; the renderer fills sockets from the pack. Wrong-polarity hallucinations cannot draw a lying diagram.
+- **Selection chart is an image, not a hallucinated WFS table.** The door sticker OCR is unreliable in the PDF. We show the chart and the synergic LCD procedure (white mark) instead of inventing 18.5 V / 312 IPM.
+- **Offline pack is a preview, not the interview.** Prox plugs in a key; the SDK path is the real agent. The pack is what the agent is *allowed* to know.
+- **No Twilio.** Expressive voice at Hertz-level is the job. This take-home proves the knowledge + visual loop first; the mic is a browser extra.
+
+## Layout
+
+```
+files/                  original manuals (owner, quick start, selection chart)
+public/manual/          rasterized pages used as figures
+public/product/         product photos from the starter repo
+src/lib/knowledge/      pack + search + duty lookup
+src/lib/artifacts/      HTML artifact templates
+src/lib/agent/          SDK runner, MCP tools, system prompt, offline preview
+src/app/api/chat/       SSE stream
+src/components/shop/    garage UI
+```
+
+## Video
+
+See the [Demo video](#demo-video) section at the top (`docs/omnipro-demo.gif` and `docs/omnipro-demo.mp4`).
